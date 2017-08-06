@@ -29,15 +29,17 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: "Boilerplate App 2"
+            title: "Calendar"
         }),
         new HtmlWebpackIncludeAssetsPlugin({
             assets:
             [
-                "main.css"
-
+                "main.css",
+                "/js/packs/solid.js",
+                "/js/fontawesome.js",
+                "https://apis.google.com/js/api.js"
             ],
-            append: true
+            append: false
         }),
         new webpack.HotModuleReplacementPlugin(),
 
@@ -45,8 +47,10 @@ module.exports = {
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         historyApiFallback: true,
-        hot: true
+        hot: true,
+        host: "0.0.0.0"
     }
 
 
 }
+

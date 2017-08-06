@@ -1,2 +1,101 @@
 body {
-  background-color: #ccc; }
+  background-color: #eee;
+  padding: 0;
+  font: menu;
+  margin: 0; }
+
+@media print {
+  .header {
+    display: none !important; }
+  html,
+  body {
+    margin: 0;
+    padding: 0; }
+  body {
+    background-color: transparent; }
+  svg {
+    position: absolute;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100%;
+    width: 100%;
+    margin: 0 !important; } }
+
+@page {
+  margin: 0.5cm; }
+
+.header {
+  width: 220px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px;
+  background-color: white;
+  box-shadow: 0 0 20px 3px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box; }
+  .header button.main {
+    display: block;
+    font: menu;
+    font-weight: 500;
+    font-size: 120%;
+    color: #004c99;
+    background-color: white;
+    outline: none;
+    border: 2px solid #004c99;
+    margin: 0 auto;
+    padding: 3px 16px; }
+  .header .title {
+    font-size: 220%;
+    color: #004c99;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center; }
+
+svg.calendar {
+  position: absolute;
+  top: 2.5vh;
+  left: calc(220px + 10px); }
+
+.group {
+  margin: 10px 0;
+  margin-bottom: 0;
+  border-top: 1px solid #004c99;
+  padding: 10px 0; }
+  .group .group-label {
+    font-weight: 500;
+    display: block;
+    color: #004c99;
+    margin: 3px 0; }
+  .group label {
+    font-weight: 500;
+    width: 80px;
+    display: inline-block; }
+  .group .row {
+    margin: 6px 0; }
+    .group .row button {
+      background: none;
+      border: none;
+      outline: none; }
+    .group .row label {
+      font-weight: 400;
+      width: 50px;
+      display: inline-block;
+      text-align: right;
+      line-height: 16px;
+      margin-right: 10px; }
+    .group .row input {
+      width: 80px;
+      display: inline-block;
+      line-height: 16px;
+      font: menu;
+      padding-left: 5px; }
+    .group .row.radio {
+      margin: 0; }
+      .group .row.radio label {
+        text-align: left;
+        line-height: 12px;
+        width: auto; }
+      .group .row.radio input {
+        width: 20px;
+        display: inline-block;
+        font: menu; }

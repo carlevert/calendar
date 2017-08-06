@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as moment from "moment";
+
+import App from "./src/Components/App"
+
 
 import { Provider } from "react-redux"
 
@@ -20,15 +24,20 @@ let root = document.createElement("div");
 root.id = "root";
 document.getElementsByTagName("body")[0].appendChild(root);
 
-ReactDOM.render(<Provider store={store}>
-   <Router history={history}>
-      <Switch>
-         <Route exact path="/" component={Main} />
-         <Route path="/hello" component={Hello} />
-         <Route path="/home" component={Home} />
-         <Route path="/nomatch" component={Main} />
-         </Switch>
-   </Router>
-</Provider>, root);
+// ReactDOM.render(<Provider store={store}>
+//    <Router history={history}>
+//       <Switch>
+//          <Route path="/" component={Main} />
+//          <Route path="/hello" component={Hello} />
+//          <Route path="/home" component={Home} />
+//          </Switch>
+//    </Router>
+// </Provider>, root);
+
+
+const startDate = moment(new Date(2017, 7, 1).valueOf() );
+
+
+ReactDOM.render(<App startDate={startDate} numWeeks={20} />, root);
 
 store.dispatch(Actions.testAction())

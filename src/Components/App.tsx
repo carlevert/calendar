@@ -10,7 +10,6 @@ import Grid from "./Grid";
 
 import { GoogleCalendarWrapper } from "../Google"
 
-
 interface AppComponentProps {
 	startDate: moment.Moment;
 	numWeeks: number;

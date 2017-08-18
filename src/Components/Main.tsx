@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 
-import { RootState } from '../reducer';
+import { State } from '../reducer';
 
 
 interface MainProps {
@@ -22,9 +22,9 @@ export class Main extends React.Component<MainProps, any> {
   }
 }
 
-function mapStateToProps(state: RootState) {
+function mapStateToProps(state: State) {
   return {
-    title: state.app.title
+     
   };
 }
 

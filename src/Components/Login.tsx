@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { GoogleCalendarWrapper } from "../Google"
 
+import { Fabric } from "office-ui-fabric-react/lib/Fabric";
+// import { DefaultButton } from "office-ui-fabric-react/lib/Button";
+import { ChoiceGroup } from "office-ui-fabric-react/lib/ChoiceGroup";
+// import { DatePicker } from "office-ui-fabric-react/lib/DatePicker"
+
 export interface ComponentProps {
    signedIn: boolean;
    signOut: () => void;
@@ -18,19 +23,32 @@ export interface ComponentState {
 const Calendars = (props: {
    calendars: gapi.client.calendar.CalendarListEntry[];
    selectCalendar: (calendar: string) => void
-}) =>
-   <div className="group">
-      <div className="group-label">Calendars</div>
-      {props.calendars.map(calendar => <div className="row radio">
-         <input
-            name="calendar-radio"
-            type="radio"
-            key={calendar.id}
-            value={calendar.id}
-            onChange={e => props.selectCalendar(e.currentTarget.value)} />
-         <label htmlFor={calendar.id}>{calendar.summary}</label>
-      </div>)}
-   </div>
+}) => {
+   if (props.calendars.length == 0)
+      return null;
+   const options = props.calendars.map(calendar => ({
+      key: calendar.id,
+      text: calendar.summary,
+      label: "Calendars"
+   }))
+   const defaultSelectedKey = props.calendars[0].id;
+   return <Fabric>
+      <ChoiceGroup options={options} defaultSelectedKey={defaultSelectedKey} />
+      </Fabric>
+
+}
+// <div className="group">
+//    <div className="group-label">Calendars</div>
+//    {props.calendars.map(calendar => <div className="row radio">
+//       <input
+//          name="calendar-radio"
+//          type="radio"
+//          key={calendar.id}
+//          value={calendar.id}
+//          onChange={e => props.selectCalendar(e.currentTarget.value)} />
+//       <label htmlFor={calendar.id}>{calendar.summary}</label>
+//    </div>)}
+// </div>
 
 
 

@@ -1,17 +1,24 @@
 import * as Redux from "redux";
+import thunk from "redux-thunk";
+import createSagaMiddleware from "redux-saga";
 
-import rootReducer, { RootState } from "./reducer";
+import rootReducer, { State as RootState } from "./reducer";
+import * as Actions from "./actions"
+
+const sagaMiddleware = createSagaMiddleware();
 
 export function configureStore(initialState?: RootState): Redux.Store<RootState> {
    const create = (<any>window).devToolsExtension ? (<any>window).devToolsExtension()(Redux.createStore) : Redux.createStore;
 
-   const store = Redux.createStore(rootReducer, initialState);
+   const store = Redux.createStore(rootReducer, initialState,
+      Redux.applyMiddleware(sagaMiddleware));
+
+   sagaMiddleware.run(Actions.rootSaga);
+
    return store;
 
 }
 
-
-// const store = Redux.createStore<State>(reducer, Redux.applyMiddleware(thunk));
 
 
 // import * as CryptoJS from "crypto-js";

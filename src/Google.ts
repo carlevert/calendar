@@ -33,12 +33,12 @@ export class GoogleCalendarWrapper {
    public async fetchCalendars() {
       await gapi.client.load("calendar", "v3");
 
-      let calendars = gapi.client.calendar.calendarList.list();
+      const calendars = gapi.client.calendar.calendarList.list();
       return new Promise<gapi.client.calendar.CalendarListEntry[]>(resolve => {
          calendars.execute(resp => {
             resolve(resp.items);
-         })
-      })
+         });
+      });
 
    }
 
@@ -51,8 +51,7 @@ export class GoogleCalendarWrapper {
          timeMin: startDate,
          timeMax: endDate
       });
-      
-      
+
       return new Promise<gapi.client.calendar.Event[]>(resolve => {
          entries.execute(resp => {
             resolve(resp.items);
@@ -62,24 +61,25 @@ export class GoogleCalendarWrapper {
    }
 
    public signIn() {
-      console.log("Signing in...");
       gapi.auth2.getAuthInstance().signIn();
    }
 
    public signOut() {
-      console.log("Signing out...");
       gapi.auth2.getAuthInstance().signOut();
    }
 
    public handleSignInChange(signedIn: boolean) {
 
       if (signedIn) {
-         console.log("Signed in");
          this.user = gapi.auth2.getAuthInstance().currentUser.get();
 
+         if (this.signInCallback)
+            this.signInCallback(signedIn);
+
       }
-      if (this.signInCallback)
-         this.signInCallback(signedIn);
+      else {
+         this.user = undefined;
+      }
 
    }
 

@@ -3,34 +3,49 @@ import { Action, isType } from "typescript-fsa";
 
 import * as Actions from "./actions"
 
-export interface AppState {
-    title: string;
-}
-export const initialAppState: AppState = {
-    title: ""
-}
-export const appReducer = (state: AppState = initialAppState, action: Redux.Action) => {
-    if (isType(action, Actions.testAction)) {
-        console.log("testAction")
-        return { title: "test" }
-    }
-    return state;
+export interface State {
+   signedIn: boolean;
+   signInStarted: boolean;
 }
 
-
-// -------------
-
-export interface RootState {
-    app: AppState;
+export const initialState: State = {
+   signedIn: false,
+   signInStarted: false
 }
 
-export default Redux.combineReducers<RootState>({
-    app: appReducer
-})
+export default (state: State = initialState, action: Redux.Action) => {
+   console.log(action)
+   if (isType(action, Actions.signIn.started)) {
+      return {
+         ...state,
+         signInStarted: true
+      }
+   }
 
+   if (isType(action, Actions.signIn.done)) {
+      if (action.payload.result.success)
+         return {
+            ...state,
+            signInStarted: false,
+            signedIn: true
+         }
+      else
+         return {
+            ...state,
+            signInStarted: false,
+            signedIn: false
+         }
+   }
+
+   if (isType(action, Actions.signIn.failed)) {
+      throw Error("Sign in failed");
+   }
+
+   return state;
+
+}
 
 // const store = Redux.createStore<State>(reducer, Redux.applyMiddleware(thunk));
-
 
 // import * as CryptoJS from "crypto-js";
 // const encrypt = (message: string, key: string) => CryptoJS.AES.encrypt(message, key).toString();

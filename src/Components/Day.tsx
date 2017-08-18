@@ -38,13 +38,14 @@ export default class DayComponent extends React.Component<DayComponentProps, Day
       const key = this.props.date.format("YYMMDD");
       const transform = `translate(${this.props.x},${this.props.y})`
       const fontSize = this.props.height * 0.21;
+      const x = this.props.width / 15;
       const y = this.props.height * 0.25;
       const eventsData = this.props.events.get(key, List());
       let i = 0;
       const events = eventsData.map((event, index) =>
          <text
             key={index}
-            x={7}
+            x={x}
             y={y * 1.2 + fontSize * (index + 1)}
             fontSize={fontSize}
             fontWeight={600}
@@ -69,7 +70,7 @@ export default class DayComponent extends React.Component<DayComponentProps, Day
             opacity="0.2"/>  */}
 
          <text onClick={e => console.log(e)}
-            x={7}
+            x={x}
             y={y}
             fontSize={fontSize}
             fontWeight={600}

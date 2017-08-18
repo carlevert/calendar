@@ -13,7 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/crypto-js": "^3.1.33",
-    "@types/react": "^15.0.25",
+    "@types/react": "^15.6.1",
     "@types/react-dom": "^15.5.0",
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
@@ -48,6 +48,10 @@
     "@types/gapi": "0.0.33",
     "@types/gapi.auth2": "0.0.41",
     "@types/gapi.calendar": "^3.0.1",
-    "moment": "^2.18.1"
+    "@types/redux-saga": "^0.10.5",
+    "moment": "^2.18.1",
+    "office-ui-fabric-react": "^4.33.0",
+    "redux-saga": "^0.15.6",
+    "typescript-fsa-redux-saga": "^1.0.2"
   }
 }

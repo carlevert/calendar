@@ -21,7 +21,6 @@ export const geometry = {
 		stroke: "black",
 	},
 
-
 	weekNumWidth: 40,
 }
 
@@ -46,6 +45,16 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 	constructor(props: GridComponentProps) {
 		super(props);
 	}
+
+   componentWillReceiveProps(props: GridComponentProps) {
+      
+      console.log(props);
+      geometry.weekNumWidth = props.width / 15;
+      
+      geometry.line1Style.strokeWidth = 6 * props.width / 550;
+      geometry.line2Style.strokeWidth = 3 * props.width / 550;
+      geometry.line3Style.strokeWidth = 1 * props.width / 550;
+   }
 
 	render() {
 
@@ -114,12 +123,13 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 			}
 
 			/* Weeknums */
-			const weekNumFontSize = Math.min(geometry.weekNumWidth, weekHeight) * 0.6;
+			// const weekNumFontSize = Math.min(geometry.weekNumWidth, weekHeight) * 0.6;
+			const weekNumFontSize = weekHeight * 0.45;
 			const weekNum = <text
 				key={GridComponent.counter++}
 
 				x={geometry.weekNumWidth / 2 + geometry.line1Style.strokeWidth}
-				y={i * weekHeight + 0.5 * weekHeight + 8}
+				y={(i+1) * weekHeight - 0.75 * weekNumFontSize}
 				fontSize={weekNumFontSize}
 				fontWeight={600}
 				textAnchor={"middle"}
@@ -177,9 +187,9 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 				style={geometry.line1Style} />
 
 			<line
-				x1={geometry.line1Style.strokeWidth + 40 + geometry.line2Style.strokeWidth / 2}
+				x1={geometry.line1Style.strokeWidth + geometry.weekNumWidth + geometry.line2Style.strokeWidth / 2}
 				y1={0}
-				x2={geometry.line1Style.strokeWidth + 40 + geometry.line2Style.strokeWidth / 2}
+				x2={geometry.line1Style.strokeWidth + geometry.weekNumWidth + geometry.line2Style.strokeWidth / 2}
 				y2={this.props.height}
 				style={geometry.line2Style} />
 

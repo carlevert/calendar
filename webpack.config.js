@@ -35,9 +35,11 @@ module.exports = {
             assets:
             [
                 "main.css",
+                "fabric.min.css",
                 "/js/packs/solid.js",
                 "/js/fontawesome.js",
-                "https://apis.google.com/js/api.js"
+                "https://apis.google.com/js/api.js",
+                "https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/4.10/css/fabric.min.css"
             ],
             append: false
         }),
@@ -49,7 +51,8 @@ module.exports = {
         historyApiFallback: true,
         hot: true,
         host: "0.0.0.0"
-    }
+    },
+      devtool: "source-map"
 
 
 }

@@ -16,7 +16,8 @@ module.exports = {
             ".ts",
             ".tsx",
             ".js",
-            ".json"
+            ".json",
+            ".scss"
         ]
     },
     module: {
@@ -24,7 +25,26 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: "ts-loader"
-            }
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    {
+                        loader: "style-loader"
+                    },
+                    {
+                        loader: "typings-for-css-modules-loader",
+                        options: {
+                            namedexport: true,
+                            camelcase: true,
+                            modules: true
+                        }
+                    },
+                    {
+                        loader: "sass-loader"
+                    }
+                ]
+            }, 
         ]
     },
     plugins: [
@@ -52,7 +72,7 @@ module.exports = {
         hot: true,
         host: "0.0.0.0"
     },
-      devtool: "source-map"
+    devtool: "source-map"
 
 
 }

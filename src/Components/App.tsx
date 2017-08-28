@@ -10,6 +10,8 @@ import Grid from "./Grid";
 
 import { GoogleCalendarWrapper } from "../Google"
 
+import * as style from "../../scss/main.scss"
+
 interface AppComponentProps {
 	startDate: moment.Moment;
 	numWeeks: number;
@@ -39,7 +41,10 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 	private rightCol: HTMLDivElement;
 
 	constructor(props: AppComponentProps) {
+
+		
 		super(props);
+		console.log(style);
 		this.google.start();
 		window.addEventListener("resize", this.resize.bind(this));
 		this.state = {
@@ -89,7 +94,6 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 
 
 	public setAspect(aspect: { width: number, height: number, margin: number }) {
-		console.log(aspect);
 		this.setState({ aspect }, this.resize);
 	}
 
@@ -109,7 +113,6 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 
 		if (signedIn) {
 			this.google.fetchCalendars().then(calendars => {
-				console.log(calendars);
 				this.setState({
 					calendars,
 					showSelectCalendar: true

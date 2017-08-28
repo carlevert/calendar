@@ -1,24 +1,22 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface ComponentProps { }
 
 export interface ComponentState { }
 
-export default class WeekComponent extends React.Component<ComponentProps, ComponentState> {
+export default class Component extends React.Component<ComponentProps, ComponentState> {
 
-   public styles: { [selector: string]: React.CSSProperties } = {
-      component: {
-         outline: "1px solid red"
-      }
-   }
+    styles: { [selector: string]: React.CSSProperties } = {
+        component: { }
+    }
 
-   constructor(props: ComponentProps) {
-      super(props);
-   }
+    constructor(props: ComponentProps) {
+        super(props);
+    }
 
-   render() {
-      return <div style={this.styles.component}>
-      </div>
-   }
+    render() {
+        return <div style={this.styles.component}>
+        </div>;
+    }
 
 }

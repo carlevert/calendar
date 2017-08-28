@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { GoogleCalendarWrapper } from "../Google"
 
+import style from "../../scss/main.scss"
+
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
 // import { DefaultButton } from "office-ui-fabric-react/lib/Button";
 import { ChoiceGroup } from "office-ui-fabric-react/lib/ChoiceGroup";

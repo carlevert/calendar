@@ -29,7 +29,8 @@ export interface GridComponentProps {
 	height: number;
 	numWeeks: number;
 	startDate: moment.Moment;
-	e: Map<string, List<{ date: moment.Moment, text: string }>>
+	events: Map<string, List<{ date: moment.Moment, text: string }>>
+	offset: number;
 }
 
 export interface GridComponentState { }
@@ -38,26 +39,25 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 
 	static counter = 0;
 
-	public styles: { [selector: string]: React.CSSProperties } = {
-		component: {}
-	}
 
 	constructor(props: GridComponentProps) {
 		super(props);
 	}
 
-   componentWillReceiveProps(props: GridComponentProps) {
-      
-      console.log(props);
-      geometry.weekNumWidth = props.width / 15;
-      
-      geometry.line1Style.strokeWidth = 6 * props.width / 550;
-      geometry.line2Style.strokeWidth = 3 * props.width / 550;
-      geometry.line3Style.strokeWidth = 1 * props.width / 550;
-   }
+	componentWillReceiveProps(props: GridComponentProps) {
+
+		const size = Math.sqrt(props.width * props.width + props.height * props.height);
+		const lineScale = 1000;
+		
+		geometry.weekNumWidth = size / 25;
+		geometry.line1Style.strokeWidth = 6 * size / lineScale;
+		geometry.line2Style.strokeWidth = 3 * size / lineScale;
+		geometry.line3Style.strokeWidth = 1 * size / lineScale;
+	}
 
 	render() {
-
+		const transform = `translate(${this.props.offset},${this.props.offset})`
+		
 		const weekHeight = this.props.height / this.props.numWeeks;
 		const weekColWidth = geometry.weekNumWidth + geometry.line1Style.strokeWidth + geometry.line2Style.strokeWidth;
 
@@ -97,7 +97,7 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 					width={dayX(j + 1) - dayX(j)}
 					height={this.props.height / this.props.numWeeks}
 					date={date}
-					events={this.props.e}
+					events={this.props.events}
 				/>
 				days.push(day)
 			}
@@ -116,9 +116,9 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 				weekDividers.push(<line
 					key={GridComponent.counter++}
 					x1={0}
-					y1={-geometry.line3Style.strokeWidth / 2 + (this.props.numWeeks) * weekHeight}
+					y1={-geometry.line3Style.strokeWidth / 2 + this.props.numWeeks * weekHeight}
 					x2={this.props.width}
-					y2={-geometry.line3Style.strokeWidth / 2 + (this.props.numWeeks) * weekHeight}
+					y2={-geometry.line3Style.strokeWidth / 2 + this.props.numWeeks * weekHeight}
 					style={geometry.line3Style} />);
 			}
 
@@ -129,7 +129,7 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 				key={GridComponent.counter++}
 
 				x={geometry.weekNumWidth / 2 + geometry.line1Style.strokeWidth}
-				y={(i+1) * weekHeight - 0.75 * weekNumFontSize}
+				y={(i + 1) * weekHeight - 0.75 * weekNumFontSize}
 				fontSize={weekNumFontSize}
 				fontWeight={600}
 				textAnchor={"middle"}
@@ -142,12 +142,17 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 			const lastWeek = week.daysInMonth() - week.date() < 7;
 			if (lastWeek) {
 				const daysLeft = week.daysInMonth() - week.date();
-				const points = [
-					[0, (i + 1) * weekHeight],
-					[dayX(daysLeft + 1), (i + 1) * weekHeight],
-					[dayX(daysLeft + 1), i * weekHeight],
-					[this.props.width, i * weekHeight],
-				];
+				const points = daysLeft == 6 ?
+					[
+						[0, (i + 1) * weekHeight],
+						[this.props.width, (i + 1) * weekHeight]
+					] : [
+						[0, (i + 1) * weekHeight],
+						[dayX(daysLeft + 1), (i + 1) * weekHeight],
+						[dayX(daysLeft + 1), i * weekHeight],
+						[this.props.width, i * weekHeight],
+					];
+
 				const pointsStr = points.map(point => point[0] + "," + point[1]).join(" ");
 				const polyline = <polyline
 					key={GridComponent.counter++}
@@ -171,7 +176,8 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 		return <svg className="calendar"
 			width={this.props.width}
 			height={this.props.height}
-			viewBox={viewBox}>
+			viewBox={viewBox}
+			transform={transform}>
 
 			<rect { ...backgroundAttrs} />
 

@@ -1,15 +1,20 @@
-var path = require("path");
-var webpack = require("webpack")
-var HtmlWebpackPlugin = require("html-webpack-plugin")
-var HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin');
+const path = require("path");
+const webpack = require("webpack")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const WriteFilePlugin = require("write-file-webpack-plugin");
 
 module.exports = {
     entry: {
-        bundle: "./index.tsx"
+        bundle: "./index.tsx",
+        scss: "./scss/main.scss"
     },
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "bundle.js"
+        filename: "[name].js",
+        publicPath: "/"
+
     },
     resolve: {
         extensions: [
@@ -28,23 +33,11 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                use: [
-                    {
-                        loader: "style-loader"
-                    },
-                    {
-                        loader: "typings-for-css-modules-loader",
-                        options: {
-                            namedexport: true,
-                            camelcase: true,
-                            modules: true
-                        }
-                    },
-                    {
-                        loader: "sass-loader"
-                    }
-                ]
-            }, 
+                loader: ExtractTextPlugin.extract([
+                    "css-loader",
+                    "sass-loader"
+                ])
+            },
         ]
     },
     plugins: [
@@ -54,17 +47,20 @@ module.exports = {
         new HtmlWebpackIncludeAssetsPlugin({
             assets:
             [
-                "main.css",
-                "fabric.min.css",
-                "/js/packs/solid.js",
-                "/js/fontawesome.js",
+                "http://localhost:8080/styles.css",
+                "http://localhost:8080/fabric.min.css",
+                "http://localhost:8080/js/packs/solid.js",
+                "http://localhost:8080/js/fontawesome.js",
                 "https://apis.google.com/js/api.js",
-                "https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/4.10/css/fabric.min.css"
             ],
-            append: false
+            append: false,
+            publicPath: false
         }),
         new webpack.HotModuleReplacementPlugin(),
-
+        new ExtractTextPlugin("styles.css"),
+        new WriteFilePlugin({
+            test: /\.css$/
+        })
     ],
     devServer: {
         contentBase: path.join(__dirname, "dist"),

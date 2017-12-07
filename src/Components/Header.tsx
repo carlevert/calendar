@@ -1,48 +1,18 @@
 import * as React from "react";
 import * as moment from "moment";
+import { debounce } from "underscore";
+
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
 import { DefaultButton, CommandButton, PrimaryButton, IButtonProps } from "office-ui-fabric-react/lib/Button";
 import { ChoiceGroup } from "office-ui-fabric-react/lib/ChoiceGroup";
 import { Panel, PanelType } from 'office-ui-fabric-react/lib/Panel';
 import { Label, ILabelProps } from "office-ui-fabric-react/lib/Label";
 import { TextField } from "office-ui-fabric-react/lib/TextField";
-
 import { DatePicker, DayOfWeek } from "office-ui-fabric-react/lib/DatePicker"
 import { SpinButton } from "office-ui-fabric-react/lib/SpinButton";
 
-import Login from "./Login"
 import Spacer from "./Spacer"
-
-const NumWeeks = (props: { numWeeks: number, setNumWeeks: (numWeeks: number) => void }) => <div className="group">
-	<div className="group-label">Number of weeks</div>
-	<div className="row">
-		<input type="text"
-			onChange={e => props.setNumWeeks(Number(e.currentTarget.value))}
-			value={props.numWeeks} />
-		<button onClick={e => props.setNumWeeks(props.numWeeks - 1)}><i className="fa fa-minus"></i></button>
-		<button onClick={e => props.setNumWeeks(props.numWeeks + 1)}><i className="fa fa-plus"></i></button>
-	</div>
-</div>
-
-
-const FirstWeek = (props: { firstWeek: moment.Moment, setFirstWeek: (weekNumber: moment.Moment) => void }) =>
-	<div className="group">
-		<div className="group-label">First week</div>
-		<div className="row">
-
-			<div>Week {props.firstWeek.format("w")}
-				<button onClick={e => props.setFirstWeek(props.firstWeek.clone().subtract(1, "week"))}>
-					<i className="fa fa-minus"></i>
-				</button>
-				<button onClick={e => props.setFirstWeek(props.firstWeek.clone().add(1, "week"))}><i className="fa fa-plus"></i></button>
-			</div>
-		</div>
-
-		<div>Starting {props.firstWeek.format("dddd YYYY-MM-DD")}</div>
-
-	</div>
-
-// -----------------------------------------
+import {  Aspect } from "./App"
 
 interface HeaderComponentProps {
 	numWeeks: number;
@@ -55,17 +25,13 @@ interface HeaderComponentProps {
 	user: string;
 	calendars: gapi.client.calendar.CalendarListEntry[],
 	selectCalendar: (calendar: string) => void,
-	aspect: {
-		width: number,
-		height: number,
-		margin: number
-	}
-	setAspect: (aspect: { width: number, height: number, margin: number }) => void;
+	aspect: Aspect;
+	setAspect: (aspect: Aspect) => void;
+	panelOpen: boolean;
 }
 
 interface HeaderComponentState {
-	formattedStartDate: string;
-	startDate: moment.Moment;
+	selectedCalendar: string;
 }
 
 export default class HeaderComponent extends React.Component<HeaderComponentProps, HeaderComponentState> {
@@ -75,6 +41,11 @@ export default class HeaderComponent extends React.Component<HeaderComponentProp
 		this.dateChanged = this.dateChanged.bind(this);
 		this.numWeeksChanged = this.numWeeksChanged.bind(this);
 		this.handleAspectChange = this.handleAspectChange.bind(this);
+		this.handleAspectChange = debounce(this.handleAspectChange, 1000);
+		this.handleRef = this.handleRef.bind(this);
+		this.state = {
+			selectedCalendar: ""
+		}
 	}
 
 	dateChanged(e: React.ChangeEvent<HTMLInputElement>) { }
@@ -84,125 +55,98 @@ export default class HeaderComponent extends React.Component<HeaderComponentProp
 		this.props.setNumWeeks(numWeeks);
 	}
 
-	handleAspectChange(e: React.SyntheticEvent<HTMLInputElement>) {
-		const change = { [e.currentTarget.name]: Number(e.currentTarget.value) }
-		const newAspect = Object.assign({}, this.props.aspect, change);
+	handleAspectChange(param: { [key: string]: number }) {
+		const newAspect = Object.assign({}, this.props.aspect, param);
 		this.props.setAspect(newAspect);
 	}
 
+	handleRef(e: HTMLDivElement) {
+		console.log(e.parentElement.parentElement);
+		this.handleAspectChange({panelWidth: e.parentElement.parentElement.offsetWidth})
+	}
 
 	render() {
+		return <Panel
+			isOpen={this.props.panelOpen}
+			isBlocking={false}
+			onDismiss={() => this.handleAspectChange({panelWidth: 0})}
+			>
+			
+			<div ref={this.handleRef}></div>
 
+			<div className="ms-font-su ms-fontColor-themePrimary">Calendar</div>
 
-		return <div className="header">
-			<Fabric>
-				<Panel isOpen={true} isBlocking={false}>
-					<div className="ms-font-su ms-fontColor-themePrimary">Calendar</div>
+			<TextField
+				label="Number of weeks"
+				onChanged={value => this.props.setNumWeeks(value as number)}
+				value={this.props.numWeeks.toString()} />
 
-					<SpinButton
-						label="Number of weeks"
-						labelPosition={0}
-						value={this.props.numWeeks.toString()}
-						onIncrement={() => this.props.setNumWeeks(this.props.numWeeks + 1)}
-						onDecrement={() => this.props.setNumWeeks(this.props.numWeeks - 1)} />
-					{/* <TextField label="Title" /> */}
-					<DatePicker
-						label={`Starting week number ${this.props.firstWeek.format("w")}`}
-						onSelectDate={d => this.props.setFirstWeek(moment(d))}
-						firstDayOfWeek={DayOfWeek.Monday}
-						value={this.props.firstWeek.toDate()} />
+			<DatePicker
+				label={`Starting week number ${this.props.firstWeek.format("w")}`}
+				onSelectDate={d => this.props.setFirstWeek(moment(d))}
+				firstDayOfWeek={DayOfWeek.Monday}
+				value={this.props.firstWeek.toDate()} />
 
-					<PrimaryButton
-						text="Print"
-						onClick={e => window.print()}
-						iconProps={{ iconName: "Print" }}></PrimaryButton>
+			<PrimaryButton
+				text="Print"
+				onClick={e => window.print()}
+				iconProps={{ iconName: "Print" }}></PrimaryButton>
 
-					<hr />
-					<Label><span className="ms-fontWeight-semibold ms-fontColor-themePrimary">Sign in with Google</span></Label>
-					<ChoiceGroup
-						defaultSelectedKey="key1"
-						options={[
-							{ text: "option1", key: "key1" },
-							{ text: "option2", key: "key2" }
-						]
-						} label="Calendars" />
-					<DefaultButton text="Sign out" />
-					<hr />
-					<Label><span className="ms-fontWeight-semibold ms-fontColor-themePrimary">Settings</span></Label>
-					<Label>Width</Label>
-					<Label>Height</Label>
-					<Label>Margin</Label>
-					<Label>Lineweight</Label>
+			<hr />
 
-				</Panel>
+			<Label>
+				<span className="ms-fontWeight-semibold ms-fontColor-themePrimary">{
+					this.props.signedIn ? this.props.user + " calendars" : "Sign in with your Google account"
+				}</span>
+			</Label>
 
+			{this.props.signedIn ? <span>
 
+				<ChoiceGroup
+					selectedKey={this.state.selectedCalendar}
+					onChange={(e, option) => {
+						console.log(option)
+						this.setState({ selectedCalendar: option.key })
+						this.props.selectCalendar(option.key)
+					}}
+					value={this.state.selectedCalendar}
+					options={this.props.calendars.map(calendar => ({
+						key: calendar.id,
+						text: calendar.summary
+					}))}
 				/>
-				<NumWeeks
-					numWeeks={this.props.numWeeks}
-					setNumWeeks={this.props.setNumWeeks} />
-				<Label>First week</Label>
-				{/* <FirstWeek
-            firstWeek={this.props.firstWeek}
-            setFirstWeek={this.props.setFirstWeek} /> */}
+				<DefaultButton
+					text="Sign out"
+					onClick={this.props.signOut} />
+			</span> :
+				<DefaultButton
+					text="Sign in"
+					onClick={this.props.signIn} />
+			}
 
-				<DatePicker
-					label={"Starting " + this.props.firstWeek.format("dddd YYYY-MM-DD")}
-					onSelectDate={d => this.props.setFirstWeek(moment(d))}
-					firstDayOfWeek={DayOfWeek.Monday}
-					value={this.props.firstWeek.toDate()} />
+			<hr />
 
+			<Label><span className="ms-fontWeight-semibold ms-fontColor-themePrimary">Settings</span></Label>
 
-				<Login signedIn={this.props.signedIn}
-					signIn={this.props.signIn}
-					signOut={this.props.signOut}
-					user={this.props.user}
-					calendars={this.props.calendars}
-					selectCalendar={this.props.selectCalendar} />
+			<Fabric style={({ width: "100px" })}>
+				<TextField
+					label="Width"
+					value={this.props.aspect.width.toString()}
+					onChanged={v => this.handleAspectChange({ width: v })} />
 
-				<Label>Settings</Label>
+				<TextField
+					label="Height"
+					value={this.props.aspect.height.toString()}
+					onChanged={v => this.handleAspectChange({ height: v })} />
 
-				<Label>Aspect ratio</Label>
-				<div className="ms-Grid">
-					<div className="ms-Grid-row">
-						<div className="ms-Grid-col ms-sm6 ms-md6 ms-6">Width</div>
-						<div className="ms-Grid-col ms-sm6 ms-md6 ms-6"><TextField /></div>
-					</div>
-				</div>
-				<TextField onChanged={this.handleAspectChange} label="width" />
-
-				<div className="group">
-					<div className="group-label">Aspect ratio</div>
-					<div className="row">
-						<label htmlFor="aspect-width">Width</label>
-						<input type="number"
-							name="width"
-							value={this.props.aspect.width}
-							onChange={this.handleAspectChange}
-							id="aspect-width" />
-					</div>
-					<div className="row">
-
-						<label htmlFor="aspect-height">Height</label>
-						<input type="number"
-							name="height"
-							value={this.props.aspect.height}
-							onChange={this.handleAspectChange}
-							id="aspect-width" />
-					</div>
-					<div className="row">
-						<label htmlFor="aspect-margin">Margin</label>
-						<input type="number"
-							name="margin"
-							value={this.props.aspect.margin}
-							onChange={this.handleAspectChange}
-							id="aspect-margin" />
-					</div>
-				</div>
-
+				<TextField
+					label="Margin"
+					value={this.props.aspect.margin.toString()}
+					onChanged={v => this.handleAspectChange({ margin: v })} />
 			</Fabric>
 
-		</div>
+
+		</Panel>
 	}
 
 }

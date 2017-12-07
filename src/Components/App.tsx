@@ -10,7 +10,12 @@ import Grid from "./Grid";
 
 import { GoogleCalendarWrapper } from "../Google"
 
-import * as style from "../../scss/main.scss"
+export interface Aspect {
+	width: number,
+	height: number,
+	margin: number,
+	panelWidth: number;
+}
 
 interface AppComponentProps {
 	startDate: moment.Moment;
@@ -28,11 +33,9 @@ interface AppComponentState {
 	selectedCalendar: gapi.client.calendar.CalendarListEntry;
 	calendars: gapi.client.calendar.CalendarListEntry[];
 	showSelectCalendar: boolean;
-	aspect: {
-		width: number,
-		height: number,
-		margin: number
-	},
+	aspect: Aspect,
+	offset: number;
+	panelOpen: boolean;
 }
 
 export default class App extends React.Component<AppComponentProps, AppComponentState> {
@@ -41,12 +44,10 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 	private rightCol: HTMLDivElement;
 
 	constructor(props: AppComponentProps) {
-
-		
 		super(props);
-		console.log(style);
 		this.google.start();
 		window.addEventListener("resize", this.resize.bind(this));
+		window.addEventListener("click", this.togglePanel.bind(this));
 		this.state = {
 			numWeeks: props.numWeeks,
 			firstWeek: moment(this.props.startDate).startOf("isoWeek"),
@@ -61,28 +62,36 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 			aspect: {
 				width: 210,
 				height: 297,
-				margin: 5
-			}
+				margin: 5,
+				panelWidth: 0
+			},
+			offset: 0,
+			panelOpen: true
 		}
 	}
 
 	public resize() {
 
-		const rect = this.rightCol.getBoundingClientRect();
+		const rect = {
+			width: window.innerWidth - this.state.aspect.panelWidth,
+			height: window.innerHeight
+		}
 
 		const aspect = (this.state.aspect.height - this.state.aspect.margin) / (this.state.aspect.width - this.state.aspect.margin);
 
-		const margin = 0.05;
+		const paperMargin = 0.05;
 
-		const paperSize = (rect.width - rect.width * margin) * aspect < rect.height ? {
-			paperWidth: rect.width - rect.width * margin,
-			paperHeight: (rect.width - rect.width * margin) * aspect
+		const paperSize = (rect.width - rect.width * paperMargin) * aspect < rect.height ? {
+			paperWidth: rect.width - rect.width * paperMargin,
+			paperHeight: (rect.width - rect.width * paperMargin) * aspect
 		} : {
-				paperWidth: (rect.height - rect.height * margin) / aspect,
-				paperHeight: rect.height - rect.height * margin
+				paperWidth: (rect.height - rect.height * paperMargin) / aspect,
+				paperHeight: rect.height - rect.height * paperMargin
 			}
 
+		this.setState({ offset: (window.innerWidth - this.state.aspect.panelWidth - paperSize.paperWidth) / 2 })
 		this.setState(paperSize);
+
 
 	}
 
@@ -93,7 +102,7 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 	}
 
 
-	public setAspect(aspect: { width: number, height: number, margin: number }) {
+	public setAspect(aspect: Aspect) {
 		this.setState({ aspect }, this.resize);
 	}
 
@@ -117,8 +126,7 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 					calendars,
 					showSelectCalendar: true
 				});
-			}
-			);
+			});
 
 		} else {
 			this.setState({
@@ -176,26 +184,14 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 
 	}
 
-	public handleRightColRef(rightCol: HTMLDivElement) {
-		this.rightCol = rightCol;
-	}
-
-	public styles: { [selector: string]: React.CSSProperties } = {
-		component: {
-			display: "flex",
-			flexDirection: "row"
-		},
-		rightColumn: {
-			position: "relative",
-			flexGrow: 1,
-			overflow: "hidden"
-		}
+	togglePanel() {
+		console.log("toggle")
+		this.setState({ panelOpen: !this.state.panelOpen });
 	}
 
 	render() {
 
-		return <div style={this.styles.component}>
-
+		return <div>
 			<HeaderComponent
 				firstWeek={this.state.firstWeek}
 				numWeeks={this.state.numWeeks}
@@ -208,16 +204,18 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 				calendars={this.state.calendars}
 				selectCalendar={this.selectCalendar.bind(this)}
 				aspect={this.state.aspect}
-				setAspect={this.setAspect.bind(this)} />
+				setAspect={this.setAspect.bind(this)}
+				panelOpen={this.state.panelOpen}
+			/>
 
 			<Grid
 				width={this.state.paperWidth}
 				height={this.state.paperHeight}
 				numWeeks={this.state.numWeeks}
 				startDate={this.state.firstWeek}
-				e={this.state.events} />
-
-			<div style={this.styles.rightColumn} ref={this.handleRightColRef.bind(this)}></div>
+				events={this.state.events}
+				offset={this.state.offset}
+			/>
 
 		</div>
 	}

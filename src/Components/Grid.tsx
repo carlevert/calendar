@@ -30,7 +30,10 @@ export interface GridComponentProps {
 	numWeeks: number;
 	startDate: moment.Moment;
 	events: Map<string, List<{ date: moment.Moment, text: string }>>
-	offset: number;
+	offset: {
+		left: number,
+		top: number
+	};
 }
 
 export interface GridComponentState { }
@@ -56,7 +59,7 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 	}
 
 	render() {
-		const transform = `translate(${this.props.offset},${this.props.offset})`
+		const transform = `translate(${this.props.offset.left},${this.props.offset.top})`
 		
 		const weekHeight = this.props.height / this.props.numWeeks;
 		const weekColWidth = geometry.weekNumWidth + geometry.line1Style.strokeWidth + geometry.line2Style.strokeWidth;
@@ -177,7 +180,8 @@ export default class GridComponent extends React.Component<GridComponentProps, G
 			width={this.props.width}
 			height={this.props.height}
 			viewBox={viewBox}
-			transform={transform}>
+			transform={transform}
+			>
 
 			<rect { ...backgroundAttrs} />
 

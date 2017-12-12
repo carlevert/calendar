@@ -47,7 +47,6 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 		super(props);
 		this.google.start();
 		window.addEventListener("resize", this.resize.bind(this));
-		window.addEventListener("click", this.togglePanel.bind(this));
 		this.state = {
 			numWeeks: props.numWeeks,
 			firstWeek: moment(this.props.startDate).startOf("isoWeek"),
@@ -70,7 +69,7 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 		}
 	}
 
-	public resize() {
+	resize() {
 
 		const rect = {
 			width: window.innerWidth - this.state.aspect.panelWidth,
@@ -88,47 +87,45 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 				paperWidth: (rect.height - rect.height * paperMargin) / aspect,
 				paperHeight: rect.height - rect.height * paperMargin
 			}
-
 		this.setState({ offset: (window.innerWidth - this.state.aspect.panelWidth - paperSize.paperWidth) / 2 })
 		this.setState(paperSize);
 
 
 	}
 
-	public setFirstWeek(firstWeek: moment.Moment) {
+	setFirstWeek(firstWeek: moment.Moment) {
 		this.setState({
 			firstWeek: moment(firstWeek).startOf("isoWeek")
 		});
 	}
 
 
-	public setAspect(aspect: Aspect) {
+	setAspect(aspect: Aspect) {
 		this.setState({ aspect }, this.resize);
 	}
 
-	public setNumWeeks(numWeeks: number) {
+	setNumWeeks(numWeeks: number) {
 		this.setState({ numWeeks }, this.resize);
 	}
 
-	public componentDidMount() {
+	componentDidMount() {
 		this.resize();
 	}
 
-	public signInOutCallback(signedIn: boolean) {
+	async signInOutCallback(signedIn: boolean) {
 		this.setState({
 			signedIn,
 			user: signedIn ? this.google.user.getBasicProfile().getName() : undefined
 		});
 
 		if (signedIn) {
-			this.google.fetchCalendars().then(calendars => {
-				this.setState({
-					calendars,
-					showSelectCalendar: true
-				});
+			const calendars = await this.google.fetchCalendars();
+			this.setState({
+				calendars,
+				showSelectCalendar: true
 			});
-
-		} else {
+		}
+		else {
 			this.setState({
 				showSelectCalendar: false,
 				calendars: [],
@@ -138,7 +135,7 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 
 	}
 
-	public fetchEvents(calendarId: string) {
+	fetchEvents(calendarId: string) {
 		const startDate = this.state.firstWeek.toISOString();
 		const endDate = this.state.firstWeek.clone().add(this.state.numWeeks, "weeks").toISOString();
 		this.google.fetchEntries(calendarId, startDate, endDate).then(events => {
@@ -176,7 +173,7 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 		});
 	}
 
-	public selectCalendar(calendar: string) {
+	selectCalendar(calendar: string) {
 		this.setState({
 			events: Map<string, List<{ date: moment.Moment, text: string }>>()
 		})
@@ -185,7 +182,6 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 	}
 
 	togglePanel() {
-		console.log("toggle")
 		this.setState({ panelOpen: !this.state.panelOpen });
 	}
 
@@ -214,7 +210,10 @@ export default class App extends React.Component<AppComponentProps, AppComponent
 				numWeeks={this.state.numWeeks}
 				startDate={this.state.firstWeek}
 				events={this.state.events}
-				offset={this.state.offset}
+				offset={({
+					left: this.state.offset,
+					top: 10
+				})}
 			/>
 
 		</div>

@@ -27,13 +27,12 @@
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
     "ts-loader": "^2.1.0",
-    "typescript": "^2.4.0-dev.20170527"
+    "typescript": "^2.6.2"
   },
   "dependencies": {
     "@types/gapi": "0.0.33",
     "@types/gapi.auth2": "0.0.41",
     "@types/gapi.calendar": "^3.0.1",
-    "@types/redux-saga": "^0.10.5",
     "@types/underscore": "^1.8.3",
     "css-loader": "^0.28.5",
     "moment": "^2.18.1",

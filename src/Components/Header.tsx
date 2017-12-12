@@ -69,8 +69,7 @@ export default class HeaderComponent extends React.Component<HeaderComponentProp
 		return <Panel
 			isOpen={this.props.panelOpen}
 			isBlocking={false}
-			onDismiss={() => this.handleAspectChange({panelWidth: 0})}
-			>
+			onDismiss={() => this.handleAspectChange({panelWidth: 0})}>
 			
 			<div ref={this.handleRef}></div>
 
